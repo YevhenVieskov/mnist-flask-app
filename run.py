@@ -4,6 +4,7 @@ run.py
 
 from flask import Flask
 from flask import request,render_template,jsonify
+from flask_cors import CORS
 
 import image
 import classifier
@@ -13,6 +14,9 @@ app = Flask(__name__)
 @app.route('/')
 def page():
     return render_template('page.html')
+    
+# Cross Origin Resource Sharing (CORS) handling
+CORS(app, resources={'/image': {"origins": "http://localhost:5000"}})
 
 @app.route('/image',methods=['POST'])
 def image_post_request():
