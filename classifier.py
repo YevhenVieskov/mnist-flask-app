@@ -12,7 +12,7 @@ global model,graph
 model_json = open('model/model.json','r').read()
 model = keras.models.model_from_json(model_json)
 model.load_weights('model/model.h5')
-#model = keras.models.load_model('model.h5')
+#model = keras.models.load_model('modelfull.h5')
 #graph = tf.compat.v1.get_default_graph()  #tf.get_default_graph()
 
 def classify(x):
