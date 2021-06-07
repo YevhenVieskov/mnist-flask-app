@@ -13,5 +13,5 @@ COPY templates templates
 
 EXPOSE 5000
 
-CMD python app.py
+CMD python run.py
 
