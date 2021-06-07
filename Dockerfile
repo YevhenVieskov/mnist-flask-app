@@ -13,5 +13,5 @@ COPY templates templates
 
 EXPOSE 5000
 
-CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "mnist_recognizer:app" ]
+CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "run:app" ]
 
