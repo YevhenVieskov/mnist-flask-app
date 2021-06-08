@@ -1,16 +1,19 @@
 version: '3.7'
 
 services:
-  app:
-    restart: always
-    build: ./app
+  app:    
+    build: 
+      context:  ./app
+    restart: unless-stopped
     expose:
       -"5000"
     ports:
       -"5000:5000"
     nginx:
       container_name: nginx
-      build: ./nginx
+      build:
+        context: ./nginx
+      restart: unless-stopped
       expose:
         -"80"
       ports:
