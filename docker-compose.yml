@@ -6,20 +6,20 @@ services:
       context:  ./app
     restart: unless-stopped
     expose:
-      -"5000"
+      - "5000"
     ports:
-      -"5000:5000"
+      - "5000:5000"
     nginx:
       container_name: nginx
       build:
         context: ./nginx
       restart: unless-stopped
       expose:
-        -"80"
+        - "80"
       ports:
-        -"80:80"
+        - "80:80"
       depends_on:
-        -app
+        - app
         
 
 
