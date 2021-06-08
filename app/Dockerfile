@@ -5,7 +5,7 @@ RUN python -m pip install --no-cache-dir flask flask-cors gunicorn numpy tensorf
 WORKDIR /app
 
 COPY image.py image.py
-COPY run.py run.py
+COPY app.py app.py
 COPY classifier.py classifier.py
 COPY model   model
 COPY static  static
