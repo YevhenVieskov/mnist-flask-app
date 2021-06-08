@@ -96,13 +96,13 @@ pipeline {
             steps { runUAT(80) }
 		}*/
 
-		{
+		
 			/*post{
 				always{
 					sh "docker-compose down || true"
 				}
 			}*/
-		}
+		
 
 	}
 }
