@@ -113,7 +113,7 @@ def buildApp() {
 	//}
 	//sh"docker build -t randomcat:${BUILD_NUMBER} ."
 	//sh "docker-compose build --no-cache"
-	sh "docker-compose up  -d --scale app=2"     //--force-recreate
+	sh "docker-compose up"  //-d --scale app=2"     //--force-recreate
 }
 
 
