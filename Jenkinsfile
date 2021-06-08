@@ -100,8 +100,8 @@ pipeline {
 			/*post{
 				always{
 					sh "docker-compose down || true"
-				}*/
-			}
+				}
+			}*/
 		}
 
 	}
