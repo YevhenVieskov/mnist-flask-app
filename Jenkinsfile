@@ -112,7 +112,7 @@ def buildApp() {
 	//	def appImage = docker.build("randomcat:${BUILD_NUMBER}")
 	//}
 	//sh"docker build -t randomcat:${BUILD_NUMBER} ."
-	sh "docker-compose build --no-cache"
+	//sh "docker-compose build --no-cache"
 	sh "docker-compose up  -d --scale app=2"     //--force-recreate
 }
 
