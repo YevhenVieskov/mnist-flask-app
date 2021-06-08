@@ -1,6 +1,6 @@
 FROM python:3.7
 
-RUN python -m pip install flask flask-cors gunicorn numpy tensorflow pillow
+RUN python -m pip install --no-cache-dir flask flask-cors gunicorn numpy tensorflow pillow
 
 WORKDIR /app
 
@@ -13,5 +13,5 @@ COPY templates templates
 
 EXPOSE 5000
 
-CMD python run.py
+CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "app:app" ]
 

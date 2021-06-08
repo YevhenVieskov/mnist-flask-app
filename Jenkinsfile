@@ -1,5 +1,9 @@
 #!/usr/bin/groovy
 
+//variables
+
+def WORKSPACE = "/usr/lib/python"                            //"/var/lib/jenkins/jobs/randomcat"
+
 pipeline {
     agent any
 
@@ -8,7 +12,7 @@ pipeline {
     }
 
 	environment {
-		PYTHONPATH = "${WORKSPACE}/mnist-flask-app"
+		PYTHONPATH = "${WORKSPACE}" // /var/lib/python "${WORKSPACE}" "${GIT_COMMIT}"
 	}
 
     stages {
@@ -16,50 +20,81 @@ pipeline {
 		//Download code from the repository
 		stage("Checkout") {			 
             steps {
-                git credentialsId: 'jenkins-user-ssh-key', url: 'git@bitbucket.org:mybitbucketuser/cats.git', branch: 'master' 
+                git credentialsId: 'github-ssh-key-micro', url: 'https://github.com/YevhenVieskov/mnist-flask-app.git', branch: 'main' 
             }
 	    } 
 		
-		stage("Test - Unit tests") {
+		/*stage("Test - Unit tests") {
 			steps { runUnittests() }
-		}
+		}*/
 
         //Building a Docker image with an application
         stage("Build") {
             steps { buildApp() }
 		}
-
-		stage("Push to Docker-repo") {
+        
+		//Uploading the  image to the remote Docker repository 
+		/*stage("Push to Docker-repo") {
             steps { pushImage() }
-                }
+                }*/
 
-        stage("Deploy - Dev") {
+        //Deploying the application from the Docker image on the Dev server 
+		/*stage("Deploy - Dev") {
             steps { deploy('dev') }
-		}
+		}*/
 
-		stage("Test - UAT Dev") {
+		//a) checking if there is already a running container with the specified name and stopping such a container, if it exists
+        //b) deleting the container stopped at the previous step
+        //c) launching a container based on the image collected in step stage("Build")
+
+        //The name of the container and the port number that is exposed outside (opens for listening on the docker host) depends on the environment
+        //Environment: container name, port 
+
+		//Dev: app_dev, 8085
+        //Stage:  app_stage, 8086
+        //Live: app_live, 8087
+
+		
+		//Running UAT Test on Dev Server 		
+		/*stage("Test - UAT Dev") {
             steps { runUAT(8888) }
-		}
+		}*/
 
-        stage("Deploy - Stage") {
+		//The script sh «tests / runUAT.sh is launched with the positional parameter $ {port}, where instead of
+        //the port number is substituted with the port number according to the environment
+
+        
+		//Deploying the application from the Docker image built in step stage("Build") on the Stage server
+		//(similar to how it was done in step  	stage("Deploy - Dev")
+
+	
+        //Deploying the application from the Docker image built in step stage("Build") on the Stage
+		// server (similar to how it was done in step stage("Deploy - Dev"))
+		/*stage("Deploy - Stage") {
             steps { deploy('stage') }
-		}
+		}*/
 
-		stage("Test - UAT Stage") {
+
+        //Running a UAT test on a Stage server (similar to how it was done in step stage("Test - UAT Dev")) 
+		/*stage("Test - UAT Stage") {
             steps { runUAT(88) }
-		}
+		}*/
 
-        stage("Approve") {
+        //Manual confirmation of application deployment on the Live server 
+        /*stage("Approve") {
             steps { approve() }
-		}
+		}*/
 
-        stage("Deploy - Live") {
+        //Deploying the application from the Docker image collected in step stage("Build") 
+		//on the Live server (similar to how it was done in step stage("Deploy - Dev")) 
+        /*stage("Deploy - Live") {
             steps { deploy('live') }
-		}
-
-		stage("Test - UAT Live") {
+		}*/
+        
+		//Running a UAT test on a Live server (similar to how it was done in step stage("Test - UAT Dev")) 
+		/*stage("Test - UAT Live") {
             steps { runUAT(80) }
-		}
+		}*/
 
 	}
 }
@@ -67,19 +102,18 @@ pipeline {
 
 // steps
 
-def pushImage(){
-    withCredentials([usernamePassword(credentialsId: 'docker-login-password-authentification', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) 
-                {
-                 sh "docker login --username ${DOCKER_USER} --password ${DOCKER_PASSWORD} https://mydocker.repo.servername"
-                 sh "docker push mydocker.repo.servername/myapp:${BUILD_NUMBER}"
-                }
-}
+
+
+
 
 def buildApp() {
-	dir ('mnist-flask-app' ) {
+	//dir ('randomcat' ) {
 		//def appImage = docker.build("mydocker.repo.servername/myapp:${BUILD_NUMBER}")
-		def appImage = docker.build("mnist-flask-app:${BUILD_NUMBER}")
-	}
+	//	def appImage = docker.build("randomcat:${BUILD_NUMBER}")
+	//}
+	//sh"docker build -t randomcat:${BUILD_NUMBER} ."
+	sh "docker-compose build --no-cache"
+	sh "docker-compose up  -d --scale app=2"     //--force-recreate
 }
 
 
@@ -105,9 +139,10 @@ def deploy(environment) {
 		System.exit(0)
 	}
 
-	sh "docker ps -f name=${containerName} -q | xargs --no-run-if-empty docker stop"
-	sh "docker ps -a -f name=${containerName} -q | xargs -r docker rm"
-	sh "docker run -d -p ${port}:5000 --name ${containerName} mnist-flask-app:${BUILD_NUMBER}"
+	//sh "docker ps -f name=${containerName} -q | xargs --no-run-if-empty docker stop"
+	//sh "docker ps -a -f name=${containerName} -q | xargs -r docker rm"
+	//sh "docker run -d -p ${port}:5000 --name ${containerName} app:${BUILD_ID}"
+	//sh "docker-compose up  -d --scale app=2"     //--force-recreate
 
 }
 
@@ -122,11 +157,28 @@ def approve() {
 
 
 def runUnittests() {
-	sh "pip3 install --no-cache-dir -r ./mnist-flask-app/requirements.txt"
-	sh "python3 mnist-flask-app/tests/test_flask_app.py"
+	
+    //sh"export WORKSPACE=`pwd`"
+	//python3 -m pip install --user virtualenv
+	//sh "pip3 install --user virtualenv"
+    //sh"virtualenv testenv -p /usr/bin/python3"
+    //sh"python3 -m venv testenv"  //!
+    //sh"source testenv/bin/activate" //!
+	//sh "pip3 install --no-cache-dir -r ./requirements.txt"	
+	//sh "cd /var/lib/jenkins/workspace/randomcat/"
+	//sh "python3  ./test_flask_app.py"
+	//sh "deactivate"
+	//sh "exit"
+	sh "chmod +x -R ${env.WORKSPACE}"
+	sh "./tests/runUT.sh"
+	
+
+	
+	
 }
 
 
 def runUAT(port) {
-	sh "mnist-flask-app/tests/runUAT.sh ${port}"
+	sh "chmod +x -R ${env.WORKSPACE}"
+	sh "./tests/runUAT.sh ${port}"
 }
