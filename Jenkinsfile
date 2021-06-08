@@ -96,6 +96,14 @@ pipeline {
             steps { runUAT(80) }
 		}*/
 
+		{
+			/*post{
+				always{
+					sh "docker-compose down || true"
+				}*/
+			}
+		}
+
 	}
 }
 
@@ -113,10 +121,11 @@ def buildApp() {
 	//}
 	//sh"docker build -t randomcat:${BUILD_NUMBER} ."
 	//sh "docker-compose build --no-cache"
+	sh "docker-compose build"
 	sh "docker-compose up"  //-d --scale app=2"     //--force-recreate
 }
 
-
+ 
 def deploy(environment) {
 
 	def containerName = ''
